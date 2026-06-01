@@ -46,6 +46,25 @@ Y te devuelve:
 
 Arriba de todo, un numero: **cobertura de demanda**, cuanta de tu demanda objetivo tiene hoy un label claro.
 
+## Como matchea (leelo antes de creerle)
+
+nav-sense hace matching **lexico**, no semantico. Funciona como un **linter**, no como un cerebro.
+
+Que quiere decir en concreto:
+
+- Colapsa morfologia: plurales, acentos, sufijos. "Integraciones" matchea "integracion", "Soluciones" matchea "solucion".
+- **No entiende sinonimos.** "Carrito" no matchea "cesta". "Auto" no matchea "coche". Si tu demanda y tu nav usan palabras distintas para la misma idea, las va a marcar como gap aunque signifiquen lo mismo.
+
+Esto es a proposito. La herramienta no adivina intencion como un LLM: compara lenguaje contra lenguaje, a la vista, sin caja negra. Esa transparencia ES la tesis. Cuando te marca un gap, sabes exactamente por que.
+
+### El slider existe por una razon honesta
+
+"Que tan parecido es parecido" no tiene verdad absoluta. Yo no tengo el numero correcto, y vos tampoco hasta que lo probas con tus datos.
+
+Por eso los umbrales (match **fuerte** y match **debil**) son **dos sliders en la UI**, no constantes que decidi yo. Defaults: `0.60` y `0.30`. Movelos y el reporte se recalcula en vivo. Subi el fuerte y vas a ver mas gaps (mas exigente). Bajalo y vas a ver menos (mas permisivo). El numero lo elegis vos, porque sos vos quien conoce tu dominio.
+
+El changelog markdown deja registrado con que umbrales se genero, asi cualquiera que lo lea sabe bajo que vara se midio.
+
 ## Demo en 30 segundos
 
 ```bash
@@ -53,7 +72,7 @@ pnpm install
 pnpm dev
 ```
 
-Abri el navegador. La app arranca con un menu demo y un set de keywords demo ya cargados, asi que ves el gap report al instante. Tocá **Analizar gap**, leé la tabla, mirá la propuesta y copiá el changelog.
+Abri el navegador. La app arranca con un menu demo y un set de keywords demo ya cargados, asi que ves el gap report al instante. Tocá **Analizar gap**, leé la tabla, mové los **sliders de umbral** para ver como cambia el reporte en vivo, mirá la propuesta y copiá el changelog.
 
 Despues borralo y pega lo tuyo.
 
@@ -95,7 +114,7 @@ Todo corre en tu navegador. No se manda nada a ningun lado, no hay backend, no h
 ## Stack
 
 - **Astro + TypeScript**, render estatico, logica client-side.
-- Motor de matching semantico propio (tokenizacion ES/EN, stemming liviano, scoring por cobertura de intencion). Sin dependencias de runtime mas alla de Astro.
+- Motor de matching lexico propio (tokenizacion ES/EN, stemming liviano, scoring por cobertura de intencion, umbrales configurables). Sin dependencias de runtime mas alla de Astro.
 - Tests del motor con el runner nativo de Node.
 
 ```bash

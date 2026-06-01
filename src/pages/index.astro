@@ -46,6 +46,25 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
         <span class="coverage hidden" id="coverage"></span>
       </div>
 
+      <section class="panel thresholds">
+        <h2>Umbrales de match</h2>
+        <p class="sub" style="margin: 0 0 0.8rem; text-align: left">
+          Cuanto parecido es parecido no tiene verdad absoluta. Lo decidis vos. Movelos y el reporte
+          se recalcula solo.
+        </p>
+        <div class="slider-row">
+          <label for="strong">Match fuerte (cubre la demanda)</label>
+          <input type="range" id="strong" min="0.3" max="0.95" step="0.05" value="0.6" />
+          <output id="strong-val">0.60</output>
+        </div>
+        <div class="slider-row">
+          <label for="weak">Match debil (apenas roza)</label>
+          <input type="range" id="weak" min="0.05" max="0.6" step="0.05" value="0.3" />
+          <output id="weak-val">0.30</output>
+        </div>
+        <button id="reset" class="ghost" style="margin-top: 0.4rem">Volver a los defaults (0.60 / 0.30)</button>
+      </section>
+
       <div id="error" class="error hidden"></div>
 
       <div id="results" class="results hidden">
@@ -93,6 +112,10 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
       const coverageEl = $<HTMLSpanElement>("coverage");
       const proposedEl = $<HTMLPreElement>("proposed");
       const changelogEl = $<HTMLPreElement>("changelog");
+      const strongEl = $<HTMLInputElement>("strong");
+      const weakEl = $<HTMLInputElement>("weak");
+      const strongValEl = $<HTMLOutputElement>("strong-val");
+      const weakValEl = $<HTMLOutputElement>("weak-val");
 
       const LABELS: Record<string, string> = {
         "missing-demand": "demanda sin label",
@@ -107,10 +130,21 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
         return d.innerHTML;
       }
 
+      function readThresholds() {
+        let strong = Number(strongEl.value);
+        let weak = Number(weakEl.value);
+        // Keep the dials coherent: weak can never sit above strong.
+        if (weak > strong) weak = strong;
+        strongValEl.textContent = strong.toFixed(2);
+        weakValEl.textContent = weak.toFixed(2);
+        return { strong, weak };
+      }
+
       function run() {
         errEl.classList.add("hidden");
         try {
-          const analysis = analyze({ menuText: menuEl.value, keywordText: kwEl.value });
+          const thresholds = readThresholds();
+          const analysis = analyze({ menuText: menuEl.value, keywordText: kwEl.value, thresholds });
           const { tree, changelog } = buildProposal(analysis);
 
           bodyEl.innerHTML = "";
@@ -154,6 +188,23 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
       });
       $<HTMLButtonElement>("copy").addEventListener("click", async () => {
         await navigator.clipboard.writeText(changelogEl.textContent ?? "");
+      });
+
+      // Live recalc: every slider nudge re-runs the analysis. The number is the
+      // user's, so the report follows the dial in real time.
+      strongEl.addEventListener("input", () => {
+        // Clamp the weak dial's ceiling to the new strong value.
+        if (Number(weakEl.value) > Number(strongEl.value)) weakEl.value = strongEl.value;
+        run();
+      });
+      weakEl.addEventListener("input", () => {
+        if (Number(weakEl.value) > Number(strongEl.value)) weakEl.value = strongEl.value;
+        run();
+      });
+      $<HTMLButtonElement>("reset").addEventListener("click", () => {
+        strongEl.value = "0.6";
+        weakEl.value = "0.3";
+        run();
       });
 
       run();

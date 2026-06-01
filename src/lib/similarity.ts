@@ -41,17 +41,33 @@ export function rank<T>(
     .sort((a, b) => b.score - a.score);
 }
 
-// Score bands. Tuned so a clear head-term match lands STRONG, a partial
-// thematic overlap lands WEAK, and noise stays NONE.
-export const BAND = {
-  STRONG: 0.6,
-  WEAK: 0.3,
-} as const;
+// Score bands. There is no universal answer to "how similar is similar
+// enough", so the cutoffs are parameters, not constants. These defaults are
+// tuned so a clear head-term match lands STRONG and a thematic overlap lands
+// WEAK, but the user owns the dial (see the sliders in the UI).
+export interface Thresholds {
+  strong: number;
+  weak: number;
+}
+
+export const DEFAULT_THRESHOLDS: Thresholds = {
+  strong: 0.6,
+  weak: 0.3,
+};
+
+// Keep a clamped, coherent pair: both inside [0,1] and weak <= strong, so a
+// bad slider combination can never invert the bands.
+export function normalizeThresholds(t: Thresholds): Thresholds {
+  const clamp = (n: number) => Math.min(1, Math.max(0, Number.isFinite(n) ? n : 0));
+  const strong = clamp(t.strong);
+  const weak = Math.min(clamp(t.weak), strong);
+  return { strong, weak };
+}
 
 export type Band = "strong" | "weak" | "none";
 
-export function bandOf(score: number): Band {
-  if (score >= BAND.STRONG) return "strong";
-  if (score >= BAND.WEAK) return "weak";
+export function bandOf(score: number, thresholds: Thresholds = DEFAULT_THRESHOLDS): Band {
+  if (score >= thresholds.strong) return "strong";
+  if (score >= thresholds.weak) return "weak";
   return "none";
 }

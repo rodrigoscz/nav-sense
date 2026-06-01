@@ -45,7 +45,8 @@ function parseIndented(text: string): NavNode[] {
 
   for (const line of lines) {
     const indent = line.length - line.trimStart().length;
-    const label = line.trim().replace(/^[-*•]\s*/, ""); // tolerate bullet markers
+    const label = line.trim().replace(/^[-*•]\s*/, "").trim(); // tolerate bullet markers
+    if (label === "") continue; // a lone bullet or marker is not a label
     const node: NavNode = { label, children: [] };
 
     while (stack.length > 0 && stack[stack.length - 1].indent >= indent) {

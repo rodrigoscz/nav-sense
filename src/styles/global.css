@@ -150,6 +150,44 @@ button:hover {
   filter: brightness(1.08);
 }
 
+.thresholds {
+  margin: 0 0 1.2rem;
+}
+
+.slider-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr 48px;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.slider-row label {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.slider-row output {
+  font-variant-numeric: tabular-nums;
+  color: var(--sand);
+  text-align: right;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--amber);
+  cursor: pointer;
+}
+
+@media (max-width: 620px) {
+  .slider-row {
+    grid-template-columns: 1fr 44px;
+  }
+  .slider-row label {
+    grid-column: 1 / -1;
+  }
+}
+
 .coverage {
   font-size: 0.9rem;
   color: var(--muted);

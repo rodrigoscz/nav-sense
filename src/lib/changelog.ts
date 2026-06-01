@@ -19,15 +19,22 @@ function findNode(nodes: NavNode[], label: string): NavNode | null {
   return null;
 }
 
-function removeNode(nodes: NavNode[], label: string): NavNode | null {
+// Remove a node identified by its label AND its ancestor path. Path-aware so
+// duplicate labels under different parents (two "API", two "Blog") do not get
+// confused: we only splice the one whose location matches the finding.
+function removeNodeByPath(nodes: NavNode[], label: string, path: string[], trail: string[] = []): NavNode | null {
   for (let i = 0; i < nodes.length; i++) {
-    if (nodes[i].label === label) {
+    if (nodes[i].label === label && samePath(trail, path)) {
       return nodes.splice(i, 1)[0];
     }
-    const deep = removeNode(nodes[i].children, label);
+    const deep = removeNodeByPath(nodes[i].children, label, path, [...trail, nodes[i].label]);
     if (deep) return deep;
   }
   return null;
+}
+
+function samePath(a: string[], b: string[]): boolean {
+  return a.length === b.length && a.every((seg, i) => seg === b[i]);
 }
 
 export interface Proposal {
@@ -64,7 +71,7 @@ export function buildProposal(analysis: Analysis): Proposal {
       else tree.push(newNode);
       adds.push({ label: f.keyword, parent });
     } else if (f.kind === "misnested-label" && f.label && f.suggestedParent) {
-      const node = removeNode(tree, f.label);
+      const node = removeNodeByPath(tree, f.label, f.path ?? []);
       const host = findNode(tree, f.suggestedParent);
       if (node && host) {
         host.children.push(node);
@@ -98,6 +105,11 @@ function renderChangelog(analysis: Analysis, c: Changes): string {
   lines.push("# Changelog de arquitectura semantica");
   lines.push("");
   lines.push(`Cobertura de demanda actual: **${pct}%** de la demanda objetivo tiene un label claro.`);
+  lines.push("");
+  lines.push(
+    `Umbrales usados: fuerte ${analysis.thresholds.strong.toFixed(2)}, debil ${analysis.thresholds.weak.toFixed(2)}. ` +
+      `Son tu decision: movelos y el reporte cambia.`,
+  );
   lines.push("");
 
   if (c.adds.length) {

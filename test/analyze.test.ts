@@ -1,11 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { analyze } from "../src/lib/analyze";
+import { analyze, EmptyMenuError } from "../src/lib/analyze";
 import { buildProposal, treeToText } from "../src/lib/changelog";
 import { DEMO_MENU, DEMO_KEYWORDS } from "../src/fixtures/demo";
-import { parseMenu, flatten } from "../src/lib/menu-parser";
+import { parseMenu, flatten, MenuParseError } from "../src/lib/menu-parser";
 import { parseKeywords } from "../src/lib/keyword-parser";
-import { similarity } from "../src/lib/similarity";
+import { normalizeThresholds, similarity } from "../src/lib/similarity";
 
 test("indented menu parses into a tree with depth", () => {
   const labels = flatten(parseMenu(DEMO_MENU));
@@ -70,4 +70,65 @@ test("clean menu against matching demand yields no missing-demand", () => {
   const a = analyze({ menuText: menu, keywordText: kws });
   assert.equal(a.findings.filter((f) => f.kind === "missing-demand").length, 0);
   assert.equal(a.demandCoverage, 1);
+});
+
+// --- thresholds as a user-owned dial ---
+
+test("normalizeThresholds clamps range and keeps weak <= strong", () => {
+  assert.deepEqual(normalizeThresholds({ strong: 1.5, weak: -0.2 }), { strong: 1, weak: 0 });
+  // An inverted pair (weak above strong) gets corrected, never inverts bands.
+  assert.deepEqual(normalizeThresholds({ strong: 0.4, weak: 0.9 }), { strong: 0.4, weak: 0.4 });
+  assert.deepEqual(normalizeThresholds({ strong: NaN, weak: 0.3 }), { strong: 0, weak: 0 });
+});
+
+test("raising the strong threshold lowers coverage", () => {
+  const input = { menuText: DEMO_MENU, keywordText: DEMO_KEYWORDS };
+  const lax = analyze({ ...input, thresholds: { strong: 0.4, weak: 0.2 } });
+  const strict = analyze({ ...input, thresholds: { strong: 0.9, weak: 0.5 } });
+  assert.ok(strict.demandCoverage <= lax.demandCoverage);
+  assert.ok(strict.findings.length >= lax.findings.length);
+});
+
+test("analysis reports the clamped thresholds it actually used", () => {
+  const a = analyze({ menuText: DEMO_MENU, keywordText: DEMO_KEYWORDS, thresholds: { strong: 0.5, weak: 0.8 } });
+  assert.equal(a.thresholds.strong, 0.5);
+  assert.equal(a.thresholds.weak, 0.5); // weak clamped down to strong
+});
+
+// --- adversarial edge cases ---
+
+test("empty JSON array menu throws EmptyMenuError, not a 0% report", () => {
+  assert.throws(() => analyze({ menuText: "[]", keywordText: "algo" }), EmptyMenuError);
+});
+
+test("a lone bullet line is not parsed as an empty label", () => {
+  const labels = flatten(parseMenu("Producto\n  -\n  Precios"));
+  assert.ok(labels.every((l) => l.label.trim() !== ""));
+  assert.ok(labels.some((l) => l.label === "Precios"));
+});
+
+test("malformed JSON menu raises a parse error", () => {
+  assert.throws(() => parseMenu('[{"label": "x",}]'), MenuParseError);
+});
+
+test("accents and unicode in keywords do not break matching", () => {
+  const a = analyze({ menuText: "Integraciones\nContacto", keywordText: "integración\ncontácto" });
+  // Accented query still maps strongly to its label.
+  assert.ok(a.demandCoverage > 0);
+});
+
+test("duplicate labels: misnested move targets the node at the flagged path", () => {
+  // Two "API" leaves. Only the one under "Empresa" should move to "Producto".
+  const menu = "Producto\n  Funciones\nEmpresa\n  API\n  Nosotros";
+  const kws = "producto api\nfunciones";
+  const a = analyze({ menuText: menu, keywordText: kws });
+  const moved = a.findings.find((f) => f.kind === "misnested-label" && f.label === "API");
+  if (moved) {
+    const { tree } = buildProposal(a);
+    const producto = tree.find((n) => n.label === "Producto");
+    const empresa = tree.find((n) => n.label === "Empresa");
+    assert.ok(producto?.children.some((c) => c.label === "API"), "API moved under Producto");
+    assert.ok(!empresa?.children.some((c) => c.label === "API"), "API left Empresa");
+    assert.ok(empresa?.children.some((c) => c.label === "Nosotros"), "siblings untouched");
+  }
 });

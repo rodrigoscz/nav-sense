@@ -1,6 +1,14 @@
 import { flatten, parseMenu, type FlatLabel, type NavNode } from "./menu-parser";
 import { anyVolume, parseKeywords, type Keyword } from "./keyword-parser";
-import { bandOf, rank, similarity, type Band } from "./similarity";
+import {
+  bandOf,
+  DEFAULT_THRESHOLDS,
+  normalizeThresholds,
+  rank,
+  similarity,
+  type Band,
+  type Thresholds,
+} from "./similarity";
 import { isVagueLabel } from "./tokenize";
 
 // The gap engine. It compares how the navigation is built against how the
@@ -29,7 +37,12 @@ export interface Finding {
 export interface AnalysisInput {
   menuText: string;
   keywordText: string;
+  // Optional. The match cutoffs are the user's call, not ours. Defaults apply
+  // when omitted, and get clamped/coerced before use.
+  thresholds?: Thresholds;
 }
+
+export class EmptyMenuError extends Error {}
 
 export interface Analysis {
   labels: FlatLabel[];
@@ -40,6 +53,7 @@ export interface Analysis {
   // strong nav home. The single number that frames the whole report.
   demandCoverage: number;
   tree: NavNode[];
+  thresholds: Thresholds; // the cutoffs actually used (after clamping)
 }
 
 function topLevelSections(labels: FlatLabel[]): FlatLabel[] {
@@ -51,8 +65,14 @@ function weightOf(kw: Keyword, hasVolume: boolean): number {
 }
 
 export function analyze(input: AnalysisInput): Analysis {
+  const thresholds = normalizeThresholds(input.thresholds ?? DEFAULT_THRESHOLDS);
   const tree = parseMenu(input.menuText);
   const labels = flatten(tree);
+  // A structurally valid but empty tree (e.g. JSON "[]") still has no labels to
+  // analyze. Treat it as an empty menu rather than reporting 0% on nothing.
+  if (labels.length === 0) {
+    throw new EmptyMenuError("El menu no tiene ningun label para analizar.");
+  }
   const keywords = parseKeywords(input.keywordText);
   const hasVolume = anyVolume(keywords);
   const findings: Finding[] = [];
@@ -62,7 +82,7 @@ export function analyze(input: AnalysisInput): Analysis {
     const ranked = rank(lab.label, keywords, (k) => k.term);
     const best = ranked[0];
     const bestScore = best ? best.score : 0;
-    const band = bandOf(bestScore);
+    const band = bandOf(bestScore, thresholds);
 
     // Ghost label: nothing in the demand set comes close.
     if (band === "none") {
@@ -80,7 +100,9 @@ export function analyze(input: AnalysisInput): Analysis {
 
     // Ambiguous label: reads as generic filler, or spreads weakly across many
     // queries without owning any. Either way the user cannot predict it.
-    const weakSpread = ranked.filter((r) => r.score >= 0.3 && r.score < 0.6).length;
+    const weakSpread = ranked.filter(
+      (r) => r.score >= thresholds.weak && r.score < thresholds.strong,
+    ).length;
     if (isVagueLabel(lab.label) || (band === "weak" && weakSpread >= 3)) {
       const clearer = best.item;
       findings.push({
@@ -100,7 +122,7 @@ export function analyze(input: AnalysisInput): Analysis {
     const ranked = rank(kw.term, labels, (l) => l.label);
     const best = ranked[0];
     const bestScore = best ? best.score : 0;
-    const band = bandOf(bestScore);
+    const band = bandOf(bestScore, thresholds);
 
     if (band !== "strong") {
       // Where would it live? Best top-level section by theme.
@@ -136,13 +158,13 @@ export function analyze(input: AnalysisInput): Analysis {
       (r) => r.item.label !== currentParent,
     );
     const better = sectionRank[0];
-    if (better && better.score >= 0.6 && better.score > ownParentScore + 0.2) {
+    if (better && better.score >= thresholds.strong && better.score > ownParentScore + 0.2) {
       findings.push({
         kind: "misnested-label",
         label: lab.label,
         path: lab.path,
         score: better.score,
-        band: bandOf(better.score),
+        band: bandOf(better.score, thresholds),
         detail: `"${lab.label}" cuelga de "${currentParent}" pero encaja mejor con "${better.item.label}".`,
         suggestion: `Mové "${lab.label}" bajo "${better.item.label}".`,
         suggestedParent: better.item.label,
@@ -157,7 +179,7 @@ export function analyze(input: AnalysisInput): Analysis {
     const w = weightOf(kw, hasVolume);
     total += w;
     const best = rank(kw.term, labels, (l) => l.label)[0];
-    if (best && best.score >= 0.6) covered += w;
+    if (best && best.score >= thresholds.strong) covered += w;
   }
   const demandCoverage = total === 0 ? 0 : covered / total;
 
@@ -174,5 +196,5 @@ export function analyze(input: AnalysisInput): Analysis {
     return b.score - a.score;
   });
 
-  return { labels, keywords, hasVolume, findings, demandCoverage, tree };
+  return { labels, keywords, hasVolume, findings, demandCoverage, tree, thresholds };
 }
