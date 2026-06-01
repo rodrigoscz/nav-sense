@@ -8,10 +8,11 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>nav-sense · la nav es una decision de lenguaje</title>
+    <title>nav-sense · la nav es una decisión de lenguaje</title>
+    <link rel="icon" type="image/svg+xml" href="/nova-mark.svg" />
     <meta
       name="description"
-      content="Pega tu menu y tus keywords. nav-sense te muestra el gap entre como esta armada la navegacion y como la gente busca."
+      content="Pegá tu menú y tus keywords. nav-sense te muestra el gap entre cómo está armada la navegación y cómo la gente busca."
     />
   </head>
   <body>
@@ -19,23 +20,23 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
       <header class="hero">
         <img src="/nova-mark.png" width="110" alt="Nova" />
         <h1>nav-sense</h1>
-        <p class="tagline">La navegacion es una decision de lenguaje, no de gusto.</p>
+        <p class="tagline">La navegación es una decisión de lenguaje, no de gusto.</p>
         <p class="sub">
-          Pega la estructura de tu menu y las keywords que te importan. Te muestro el gap entre como
-          esta armada la nav y como la gente realmente busca. Todo corre en tu navegador, no se manda
-          nada a ningun lado.
+          Pegá la estructura de tu menú y las keywords que te importan. Te muestro el gap entre cómo
+          está armada la nav y cómo la gente realmente busca. Todo corre en tu navegador, no se manda
+          nada a ningún lado.
         </p>
       </header>
 
       <div class="grid">
         <section class="panel">
-          <h2>Menu / Arquitectura</h2>
+          <h2>Menú / Arquitectura</h2>
           <label class="field" for="menu">Texto indentado o JSON [&#123; label, children &#125;]</label>
           <textarea id="menu" spellcheck="false">{DEMO_MENU}</textarea>
         </section>
         <section class="panel">
           <h2>Keywords / Entidades</h2>
-          <label class="field" for="keywords">Una por linea. Volumen opcional: termino | 1200</label>
+          <label class="field" for="keywords">Una por línea. Volumen opcional: término | 1200</label>
           <textarea id="keywords" spellcheck="false">{DEMO_KEYWORDS}</textarea>
         </section>
       </div>
@@ -49,7 +50,7 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
       <section class="panel thresholds">
         <h2>Umbrales de match</h2>
         <p class="sub" style="margin: 0 0 0.8rem; text-align: left">
-          Cuanto parecido es parecido no tiene verdad absoluta. Lo decidis vos. Movelos y el reporte
+          Cuánto parecido es parecido no tiene verdad absoluta. Lo decidís vos. Movelos y el reporte
           se recalcula solo.
         </p>
         <div class="slider-row">
