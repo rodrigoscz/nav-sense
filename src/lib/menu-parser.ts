@@ -24,7 +24,7 @@ function isNavNodeArray(value: unknown): value is { label: string; children?: un
 function coerceJson(value: { label: string; children?: unknown }[]): NavNode[] {
   return value.map((raw) => {
     if (typeof raw.label !== "string" || raw.label.trim() === "") {
-      throw new MenuParseError("Cada nodo necesita un label de texto no vacio.");
+      throw new MenuParseError("Cada nodo necesita un label de texto no vacío.");
     }
     const children = isNavNodeArray(raw.children) ? coerceJson(raw.children) : [];
     return { label: raw.label.trim(), children };
@@ -61,24 +61,24 @@ function parseIndented(text: string): NavNode[] {
   }
 
   if (roots.length === 0) {
-    throw new MenuParseError("No encontre ninguna entrada de menu en el texto.");
+    throw new MenuParseError("No encontré ninguna entrada de menú en el texto.");
   }
   return roots;
 }
 
 export function parseMenu(input: string): NavNode[] {
   const trimmed = input.trim();
-  if (trimmed === "") throw new MenuParseError("El menu esta vacio.");
+  if (trimmed === "") throw new MenuParseError("El menú está vacío.");
   if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
     let parsed: unknown;
     try {
       parsed = JSON.parse(trimmed);
     } catch {
-      throw new MenuParseError("Parece JSON pero no se pudo parsear. Revisa comas y comillas.");
+      throw new MenuParseError("Parece JSON pero no se pudo parsear. Revisá comas y comillas.");
     }
     const arr = Array.isArray(parsed) ? parsed : [parsed];
     if (!isNavNodeArray(arr)) {
-      throw new MenuParseError('JSON invalido. Forma esperada: [{ "label": "...", "children": [...] }].');
+      throw new MenuParseError('JSON inválido. Forma esperada: [{ "label": "...", "children": [...] }].');
     }
     return coerceJson(arr as { label: string; children?: unknown }[]);
   }

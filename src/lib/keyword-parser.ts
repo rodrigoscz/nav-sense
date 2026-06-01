@@ -26,7 +26,7 @@ function parseLine(line: string): Keyword | null {
 
 export function parseKeywords(input: string): Keyword[] {
   const trimmed = input.trim();
-  if (trimmed === "") throw new KeywordParseError("La lista de keywords esta vacia.");
+  if (trimmed === "") throw new KeywordParseError("La lista de keywords está vacía.");
 
   if (trimmed.startsWith("[")) {
     let parsed: unknown;
@@ -36,7 +36,7 @@ export function parseKeywords(input: string): Keyword[] {
       throw new KeywordParseError("Parece JSON pero no se pudo parsear.");
     }
     if (!Array.isArray(parsed)) {
-      throw new KeywordParseError("JSON invalido. Esperaba un array.");
+      throw new KeywordParseError("JSON inválido. Esperaba un array.");
     }
     const out: Keyword[] = [];
     for (const entry of parsed) {
@@ -51,7 +51,7 @@ export function parseKeywords(input: string): Keyword[] {
       }
     }
     if (out.length === 0) {
-      throw new KeywordParseError('JSON sin keywords validas. Forma: [{ "term": "...", "volume": 0 }].');
+      throw new KeywordParseError('JSON sin keywords válidas. Forma: [{ "term": "...", "volume": 0 }].');
     }
     return dedupe(out);
   }
@@ -61,7 +61,7 @@ export function parseKeywords(input: string): Keyword[] {
     const kw = parseLine(line);
     if (kw && kw.term) out.push(kw);
   }
-  if (out.length === 0) throw new KeywordParseError("No encontre keywords en la lista.");
+  if (out.length === 0) throw new KeywordParseError("No encontré keywords en la lista.");
   return dedupe(out);
 }
 

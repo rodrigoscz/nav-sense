@@ -75,7 +75,7 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
           <output id="strong-val">0.60</output>
         </div>
         <div class="slider-row">
-          <label for="weak">Match debil (apenas roza)</label>
+          <label for="weak">Match débil (apenas roza)</label>
           <input type="range" id="weak" min="0.05" max="0.6" step="0.05" value="0.3" />
           <output id="weak-val">0.30</output>
         </div>
@@ -90,9 +90,9 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
           <thead>
             <tr>
               <th>Tipo</th>
-              <th>Que</th>
+              <th>Qué</th>
               <th>Vol.</th>
-              <th>Diagnostico</th>
+              <th>Diagnóstico</th>
               <th>Sugerencia</th>
             </tr>
           </thead>
@@ -196,7 +196,7 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
         } catch (e) {
           resultsEl.classList.add("hidden");
           coverageEl.classList.add("hidden");
-          errEl.textContent = e instanceof Error ? e.message : "Algo salio mal al analizar.";
+          errEl.textContent = e instanceof Error ? e.message : "Algo salió mal al analizar.";
           errEl.classList.remove("hidden");
         }
       }

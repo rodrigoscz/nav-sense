@@ -13,7 +13,7 @@ export const DEMO_MENU = `Producto
   API
 Recursos
   Blog
-  Casos de exito
+  Casos de éxito
 Empresa
   Nosotros
   Novedades

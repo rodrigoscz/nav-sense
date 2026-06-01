@@ -102,12 +102,12 @@ interface Changes {
 function renderChangelog(analysis: Analysis, c: Changes): string {
   const pct = Math.round(analysis.demandCoverage * 100);
   const lines: string[] = [];
-  lines.push("# Changelog de arquitectura semantica");
+  lines.push("# Changelog de arquitectura semántica");
   lines.push("");
   lines.push(`Cobertura de demanda actual: **${pct}%** de la demanda objetivo tiene un label claro.`);
   lines.push("");
   lines.push(
-    `Umbrales usados: fuerte ${analysis.thresholds.strong.toFixed(2)}, debil ${analysis.thresholds.weak.toFixed(2)}. ` +
+    `Umbrales usados: fuerte ${analysis.thresholds.strong.toFixed(2)}, débil ${analysis.thresholds.weak.toFixed(2)}. ` +
       `Son tu decision: movelos y el reporte cambia.`,
   );
   lines.push("");
@@ -140,7 +140,7 @@ function renderChangelog(analysis: Analysis, c: Changes): string {
   }
 
   lines.push("---");
-  lines.push("Generado por nav-sense. La navegacion es una decision de lenguaje, no de gusto.");
+  lines.push("Generado por nav-sense. La navegación es una decisión de lenguaje, no de gusto.");
   return lines.join("\n");
 }
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/nova-mark.png" width="150" alt="Nova" />
+<img src="public/nova-mark-badge.svg" width="150" alt="Nova" />
 
 # nav-sense
 

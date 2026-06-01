@@ -71,7 +71,7 @@ export function analyze(input: AnalysisInput): Analysis {
   // A structurally valid but empty tree (e.g. JSON "[]") still has no labels to
   // analyze. Treat it as an empty menu rather than reporting 0% on nothing.
   if (labels.length === 0) {
-    throw new EmptyMenuError("El menu no tiene ningun label para analizar.");
+    throw new EmptyMenuError("El menú no tiene ningún label para analizar.");
   }
   const keywords = parseKeywords(input.keywordText);
   const hasVolume = anyVolume(keywords);
@@ -93,7 +93,7 @@ export function analyze(input: AnalysisInput): Analysis {
         score: bestScore,
         band,
         detail: `"${lab.label}" no matchea con ninguna keyword objetivo. Ocupa lugar en la nav sin captar demanda.`,
-        suggestion: `Confirma con datos si "${lab.label}" tiene busquedas propias. Si no, fusionalo o sacalo.`,
+        suggestion: `Confirmá con datos si "${lab.label}" tiene búsquedas propias. Si no, fusionalo o sacalo.`,
       });
       continue;
     }
@@ -111,7 +111,7 @@ export function analyze(input: AnalysisInput): Analysis {
         path: lab.path,
         score: bestScore,
         band,
-        detail: `"${lab.label}" es ambiguo: ${isVagueLabel(lab.label) ? "es una palabra generica de nav" : `se reparte entre ${weakSpread} intenciones sin quedarse con ninguna`}.`,
+        detail: `"${lab.label}" es ambiguo: ${isVagueLabel(lab.label) ? "es una palabra genérica de nav" : `se reparte entre ${weakSpread} intenciones sin quedarse con ninguna`}.`,
         suggestion: `Renombralo a algo que la gente busca, por ejemplo "${clearer.term}".`,
       });
     }
@@ -138,10 +138,10 @@ export function analyze(input: AnalysisInput): Analysis {
         detail:
           band === "none"
             ? `Nadie en la nav responde a "${kw.term}". Demanda sin puerta de entrada.`
-            : `"${kw.term}" solo matchea debil ("${best.item.label}"). La intencion no tiene un label claro.`,
+            : `"${kw.term}" solo matchea débil ("${best.item.label}"). La intención no tiene un label claro.`,
         suggestion: parent
-          ? `Crea un label para "${kw.term}"${parent ? ` bajo "${parent}"` : ""}.`
-          : `Crea un label para "${kw.term}".`,
+          ? `Creá un label para "${kw.term}"${parent ? ` bajo "${parent}"` : ""}.`
+          : `Creá un label para "${kw.term}".`,
         suggestedParent: parent,
       });
     }
@@ -166,7 +166,7 @@ export function analyze(input: AnalysisInput): Analysis {
         score: better.score,
         band: bandOf(better.score, thresholds),
         detail: `"${lab.label}" cuelga de "${currentParent}" pero encaja mejor con "${better.item.label}".`,
-        suggestion: `Mové "${lab.label}" bajo "${better.item.label}".`,
+        suggestion: `Movelo bajo "${better.item.label}".`,
         suggestedParent: better.item.label,
       });
     }
