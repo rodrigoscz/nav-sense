@@ -1,0 +1,23 @@
+{
+  "name": "nav-sense",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Gap report between how a site menu is built and how people actually search.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "astro": "^4.16.18"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@types/node": "^25.9.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

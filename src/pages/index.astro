@@ -1,0 +1,162 @@
+---
+import "../styles/global.css";
+import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>nav-sense · la nav es una decision de lenguaje</title>
+    <meta
+      name="description"
+      content="Pega tu menu y tus keywords. nav-sense te muestra el gap entre como esta armada la navegacion y como la gente busca."
+    />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <img src="/nova-mark.png" width="110" alt="Nova" />
+        <h1>nav-sense</h1>
+        <p class="tagline">La navegacion es una decision de lenguaje, no de gusto.</p>
+        <p class="sub">
+          Pega la estructura de tu menu y las keywords que te importan. Te muestro el gap entre como
+          esta armada la nav y como la gente realmente busca. Todo corre en tu navegador, no se manda
+          nada a ningun lado.
+        </p>
+      </header>
+
+      <div class="grid">
+        <section class="panel">
+          <h2>Menu / Arquitectura</h2>
+          <label class="field" for="menu">Texto indentado o JSON [&#123; label, children &#125;]</label>
+          <textarea id="menu" spellcheck="false">{DEMO_MENU}</textarea>
+        </section>
+        <section class="panel">
+          <h2>Keywords / Entidades</h2>
+          <label class="field" for="keywords">Una por linea. Volumen opcional: termino | 1200</label>
+          <textarea id="keywords" spellcheck="false">{DEMO_KEYWORDS}</textarea>
+        </section>
+      </div>
+
+      <div class="actions">
+        <button id="analyze">Analizar gap</button>
+        <button id="demo" class="ghost">Cargar demo</button>
+        <span class="coverage hidden" id="coverage"></span>
+      </div>
+
+      <div id="error" class="error hidden"></div>
+
+      <div id="results" class="results hidden">
+        <h2>Gap report</h2>
+        <table id="gap-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Que</th>
+              <th>Vol.</th>
+              <th>Diagnostico</th>
+              <th>Sugerencia</th>
+            </tr>
+          </thead>
+          <tbody id="gap-body"></tbody>
+        </table>
+
+        <h2>Propuesta de IA reordenada</h2>
+        <pre class="changelog" id="proposed"></pre>
+
+        <h2>Changelog markdown</h2>
+        <div class="actions" style="margin: 0 0 0.6rem">
+          <button id="copy" class="ghost">Copiar changelog</button>
+        </div>
+        <pre class="changelog" id="changelog"></pre>
+      </div>
+
+      <footer>
+        nav-sense · suite open-source de <a href="https://github.com/rodrigoscz">@rodrigoscz</a> ·
+        todo es lenguaje
+      </footer>
+    </div>
+
+    <script>
+      import { analyze } from "../lib/analyze";
+      import { buildProposal, treeToText } from "../lib/changelog";
+      import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
+
+      const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+      const menuEl = $<HTMLTextAreaElement>("menu");
+      const kwEl = $<HTMLTextAreaElement>("keywords");
+      const errEl = $<HTMLDivElement>("error");
+      const resultsEl = $<HTMLDivElement>("results");
+      const bodyEl = $<HTMLTableSectionElement>("gap-body");
+      const coverageEl = $<HTMLSpanElement>("coverage");
+      const proposedEl = $<HTMLPreElement>("proposed");
+      const changelogEl = $<HTMLPreElement>("changelog");
+
+      const LABELS: Record<string, string> = {
+        "missing-demand": "demanda sin label",
+        "ghost-label": "label sin demanda",
+        "ambiguous-label": "label ambiguo",
+        "misnested-label": "mal anidado",
+      };
+
+      function esc(s: string): string {
+        const d = document.createElement("div");
+        d.textContent = s;
+        return d.innerHTML;
+      }
+
+      function run() {
+        errEl.classList.add("hidden");
+        try {
+          const analysis = analyze({ menuText: menuEl.value, keywordText: kwEl.value });
+          const { tree, changelog } = buildProposal(analysis);
+
+          bodyEl.innerHTML = "";
+          if (analysis.findings.length === 0) {
+            bodyEl.innerHTML =
+              '<tr><td colspan="5" class="empty">Sin gaps. La nav ya habla el idioma de la demanda.</td></tr>';
+          }
+          for (const f of analysis.findings) {
+            const what = f.label ?? f.keyword ?? "";
+            const vol = f.volume && f.volume > 0 ? String(f.volume) : "·";
+            const tr = document.createElement("tr");
+            tr.innerHTML =
+              `<td><span class="tag ${f.kind}">${LABELS[f.kind]}</span></td>` +
+              `<td>${esc(what)}</td>` +
+              `<td>${vol}</td>` +
+              `<td>${esc(f.detail)}</td>` +
+              `<td class="suggestion">${esc(f.suggestion)}</td>`;
+            bodyEl.appendChild(tr);
+          }
+
+          const pct = Math.round(analysis.demandCoverage * 100);
+          coverageEl.innerHTML = `cobertura de demanda: <strong>${pct}%</strong>`;
+          coverageEl.classList.remove("hidden");
+
+          proposedEl.textContent = treeToText(tree);
+          changelogEl.textContent = changelog;
+          resultsEl.classList.remove("hidden");
+        } catch (e) {
+          resultsEl.classList.add("hidden");
+          coverageEl.classList.add("hidden");
+          errEl.textContent = e instanceof Error ? e.message : "Algo salio mal al analizar.";
+          errEl.classList.remove("hidden");
+        }
+      }
+
+      $<HTMLButtonElement>("analyze").addEventListener("click", run);
+      $<HTMLButtonElement>("demo").addEventListener("click", () => {
+        menuEl.value = DEMO_MENU;
+        kwEl.value = DEMO_KEYWORDS;
+        run();
+      });
+      $<HTMLButtonElement>("copy").addEventListener("click", async () => {
+        await navigator.clipboard.writeText(changelogEl.textContent ?? "");
+      });
+
+      run();
+    </script>
+  </body>
+</html>
