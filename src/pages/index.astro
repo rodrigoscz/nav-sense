@@ -1,4 +1,5 @@
 ---
+import "../styles/theme.css";
 import "../styles/global.css";
 import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
 ---
@@ -9,16 +10,31 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>nav-sense · la nav es una decisión de lenguaje</title>
-    <link rel="icon" type="image/svg+xml" href="/nova-mark.svg" />
+    <link rel="icon" type="image/svg+xml" href="/nova-mark-badge.svg" />
     <meta
       name="description"
       content="Pegá tu menú y tus keywords. nav-sense te muestra el gap entre cómo está armada la navegación y cómo la gente busca."
     />
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem("theme");
+          if (t === "dark" || t === "light")
+            document.documentElement.dataset.theme = t;
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
+    <button
+      id="theme-toggle"
+      class="theme-toggle"
+      type="button"
+      aria-label="Cambiar tema"
+    >☾ oscuro</button>
     <div class="wrap">
       <header class="hero">
-        <img src="/nova-mark.png" width="110" alt="Nova" />
+        <img src="/nova-mark-badge.svg" width="120" height="120" alt="Nova mark" />
         <h1>nav-sense</h1>
         <p class="tagline">La navegación es una decisión de lenguaje, no de gusto.</p>
         <p class="sub">
@@ -94,8 +110,12 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
       </div>
 
       <footer>
-        nav-sense · suite open-source de <a href="https://github.com/rodrigoscz">@rodrigoscz</a> ·
-        todo es lenguaje
+        <p class="suite">
+          <img src="/nova-mark-badge.svg" width="16" height="16" alt="" />
+          nav-sense · parte de la suite «todo es lenguaje» ·
+          <a href="https://x.com/rodrigoscz_">@rodrigoscz_</a> ·
+          <a href="https://github.com/rodrigoscz/nav-sense">repo</a>
+        </p>
       </footer>
     </div>
 
@@ -209,6 +229,33 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
       });
 
       run();
+    </script>
+
+    <script is:inline>
+      (function () {
+        var btn = document.getElementById("theme-toggle");
+        if (!btn) return;
+        function current() {
+          return (
+            document.documentElement.dataset.theme ||
+            (window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light")
+          );
+        }
+        function label() {
+          btn.textContent = current() === "dark" ? "☀ claro" : "☾ oscuro";
+        }
+        label();
+        btn.addEventListener("click", function () {
+          var next = current() === "dark" ? "light" : "dark";
+          document.documentElement.dataset.theme = next;
+          try {
+            localStorage.setItem("theme", next);
+          } catch (e) {}
+          label();
+        });
+      })();
     </script>
   </body>
 </html>

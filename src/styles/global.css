@@ -1,21 +1,6 @@
-:root {
-  /* Nova palette: tierra / otoñal */
-  --sand: #e7cda6;
-  --sand-stroke: #cbae80;
-  --ink: #2e2117;
-  --brown: #7a5230;
-  --amber: #c46a2b;
-  --amber-stroke: #8a4a1d;
-  --dark: #0d1117;
-
-  --bg: var(--dark);
-  --panel: #161b22;
-  --panel-stroke: #2a2118;
-  --text: #ede4d3;
-  --muted: #b6a98f;
-
-  --mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, monospace;
-}
+/* nav-sense component styles. Palette comes from theme.css (suite tokens:
+   --arena --ink --brown --terra --paper --line --field --codebg), so light and
+   dark flip automatically. No hardcoded colors here. */
 
 * {
   box-sizing: border-box;
@@ -23,26 +8,27 @@
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--mono);
-  line-height: 1.5;
+  background: var(--arena);
+  color: var(--ink);
+  font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+  line-height: 1.55;
   font-size: 15px;
 }
 
 a {
-  color: var(--amber);
+  color: var(--terra);
 }
 
 .wrap {
-  max-width: 1080px;
+  max-width: 880px;
   margin: 0 auto;
-  padding: 2.2rem 1.2rem 4rem;
+  padding: 2rem 1.25rem 4rem;
 }
 
 header.hero {
   text-align: center;
   margin-bottom: 2rem;
+  padding: 1rem 0 1.5rem;
 }
 
 header.hero img {
@@ -50,21 +36,23 @@ header.hero img {
 }
 
 header.hero h1 {
-  font-size: 1.9rem;
-  margin: 0.6rem 0 0.2rem;
-  color: var(--sand);
-  letter-spacing: 0.5px;
+  font-size: 2.4rem;
+  margin: 0.4rem 0 0.2rem;
+  color: var(--ink);
+  letter-spacing: 0.04em;
 }
 
 .tagline {
-  color: var(--amber);
-  font-weight: bold;
+  color: var(--terra);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin: 0.6rem 0 0.3rem;
 }
 
 .sub {
-  color: var(--muted);
-  max-width: 640px;
-  margin: 0.4rem auto 0;
+  color: var(--brown);
+  max-width: 56ch;
+  margin: 0.3rem auto 0;
   font-size: 0.92rem;
 }
 
@@ -81,9 +69,9 @@ header.hero h1 {
 }
 
 .panel {
-  background: var(--panel);
-  border: 1px solid var(--panel-stroke);
-  border-radius: 8px;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 10px;
   padding: 1rem;
 }
 
@@ -91,33 +79,33 @@ header.hero h1 {
   margin: 0 0 0.6rem;
   font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--amber);
+  letter-spacing: 0.08em;
+  color: var(--brown);
 }
 
 label.field {
   display: block;
   font-size: 0.78rem;
-  color: var(--muted);
+  color: var(--brown);
   margin-bottom: 0.3rem;
 }
 
 textarea {
   width: 100%;
   min-height: 170px;
-  background: #0e1217;
-  color: var(--text);
-  border: 1px solid var(--panel-stroke);
+  background: var(--field);
+  color: var(--ink);
+  border: 2px solid var(--line);
   border-radius: 6px;
   padding: 0.6rem;
-  font-family: var(--mono);
+  font: inherit;
   font-size: 0.85rem;
   resize: vertical;
 }
 
-textarea:focus {
+textarea:focus-visible {
   outline: none;
-  border-color: var(--amber);
+  border-color: var(--terra);
 }
 
 .actions {
@@ -129,27 +117,52 @@ textarea:focus {
 }
 
 button {
-  font-family: var(--mono);
+  font: inherit;
   font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
   border-radius: 6px;
-  padding: 0.55rem 1rem;
-  border: 1px solid var(--amber-stroke);
-  background: var(--amber);
-  color: #1a120a;
-  font-weight: bold;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  background: var(--terra);
+  color: #fff;
+  letter-spacing: 0.03em;
+}
+
+button:hover {
+  background: var(--ink);
 }
 
 button.ghost {
   background: transparent;
-  color: var(--sand);
-  border-color: var(--panel-stroke);
+  color: var(--brown);
+  border: 2px solid var(--brown);
+  font-weight: 400;
 }
 
-button:hover {
-  filter: brightness(1.08);
+button.ghost:hover {
+  background: transparent;
+  border-color: var(--terra);
+  color: var(--terra);
 }
 
+button:focus-visible {
+  outline: 2px solid var(--terra);
+  outline-offset: 2px;
+}
+
+.coverage {
+  font-size: 0.9rem;
+  color: var(--brown);
+  margin-left: auto;
+}
+
+.coverage strong {
+  color: var(--terra);
+  font-size: 1.1rem;
+}
+
+/* threshold sliders */
 .thresholds {
   margin: 0 0 1.2rem;
 }
@@ -164,19 +177,24 @@ button:hover {
 
 .slider-row label {
   font-size: 0.82rem;
-  color: var(--muted);
+  color: var(--brown);
 }
 
 .slider-row output {
   font-variant-numeric: tabular-nums;
-  color: var(--sand);
+  color: var(--terra);
   text-align: right;
 }
 
 input[type="range"] {
   width: 100%;
-  accent-color: var(--amber);
+  accent-color: var(--terra);
   cursor: pointer;
+}
+
+input[type="range"]:focus-visible {
+  outline: 2px solid var(--terra);
+  outline-offset: 4px;
 }
 
 @media (max-width: 620px) {
@@ -188,21 +206,10 @@ input[type="range"] {
   }
 }
 
-.coverage {
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin-left: auto;
-}
-
-.coverage strong {
-  color: var(--sand);
-  font-size: 1.1rem;
-}
-
 .error {
-  color: #e8866b;
-  background: #2a1712;
-  border: 1px solid #5a2c1d;
+  color: #8a3b1e;
+  background: rgba(138, 59, 30, 0.12);
+  border: 2px solid rgba(138, 59, 30, 0.4);
   padding: 0.6rem 0.8rem;
   border-radius: 6px;
   margin-bottom: 1rem;
@@ -211,6 +218,17 @@ input[type="range"] {
 
 .hidden {
   display: none;
+}
+
+/* gap report table */
+.results h2 {
+  color: var(--brown);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 2px solid var(--line);
+  padding-bottom: 0.3rem;
+  margin: 1.8rem 0 0.8rem;
 }
 
 table {
@@ -223,75 +241,125 @@ th,
 td {
   text-align: left;
   padding: 0.5rem 0.6rem;
-  border-bottom: 1px solid var(--panel-stroke);
+  border-bottom: 1px solid var(--line);
   vertical-align: top;
 }
 
 th {
-  color: var(--amber);
+  color: var(--brown);
   font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.05em;
 }
 
 .tag {
   display: inline-block;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   padding: 0.12rem 0.45rem;
   border-radius: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
+/* semantic colors: terrosos, legibles en light y dark */
 .tag.missing-demand {
-  background: #3a1d14;
-  color: #f0a17e;
+  background: rgba(138, 59, 30, 0.18);
+  color: #8a3b1e;
 }
 .tag.ghost-label {
-  background: #2a2118;
-  color: var(--sand);
+  background: var(--codebg);
+  color: var(--brown);
 }
 .tag.ambiguous-label {
-  background: #2e2a14;
-  color: #d9c772;
+  background: rgba(196, 106, 43, 0.18);
+  color: var(--terra);
 }
 .tag.misnested-label {
-  background: #14242a;
-  color: #82c7d6;
+  background: rgba(92, 122, 46, 0.18);
+  color: #5c7a2e;
 }
 
 .suggestion {
-  color: var(--amber);
+  color: var(--terra);
 }
 
 pre.changelog {
-  background: #0e1217;
-  border: 1px solid var(--panel-stroke);
-  border-radius: 6px;
+  background: var(--field);
+  border: 2px solid var(--line);
+  border-radius: 8px;
   padding: 1rem;
   overflow-x: auto;
+  font: inherit;
   font-size: 0.82rem;
   white-space: pre-wrap;
 }
 
-.results h2 {
-  color: var(--amber);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 1.6rem 0 0.6rem;
+#proposed,
+#changelog {
+  border-left-width: 6px;
+  border-left-color: var(--terra);
 }
 
 footer {
   text-align: center;
-  color: var(--muted);
+  color: var(--brown);
   font-size: 0.78rem;
   margin-top: 3rem;
 }
 
+footer a {
+  color: var(--terra);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+footer a:hover {
+  border-bottom-color: var(--terra);
+}
+
+.suite img {
+  vertical-align: -3px;
+  margin-right: 0.35rem;
+  image-rendering: pixelated;
+}
+
 .empty {
-  color: var(--muted);
+  color: var(--brown);
   font-style: italic;
   padding: 0.6rem;
+}
+
+/* theme toggle: idéntico a la suite */
+.theme-toggle {
+  position: fixed;
+  top: 0.9rem;
+  right: 0.9rem;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 400;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.theme-toggle:hover {
+  background: var(--paper);
+  border-color: var(--terra);
+  color: var(--terra);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--terra);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
 }
