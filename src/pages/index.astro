@@ -2,6 +2,16 @@
 import "../styles/theme.css";
 import "../styles/global.css";
 import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
+
+// Astro rewrites its own bundled assets for `base`, but not paths written
+// literally in the markup, so these have to go through BASE_URL.
+const mark = `${import.meta.env.BASE_URL}nova-mark-badge.svg`;
+
+const title = "nav-sense · la nav es una decisión de lenguaje";
+const description =
+  "Pegá tu menú y tus keywords. nav-sense te muestra el gap entre cómo está armada la navegación y cómo la gente busca.";
+const canonical = new URL(import.meta.env.BASE_URL, Astro.site).href;
+const ogImage = new URL("/og.png", Astro.site).href;
 ---
 
 <!doctype html>
@@ -9,12 +19,24 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>nav-sense · la nav es una decisión de lenguaje</title>
-    <link rel="icon" type="image/svg+xml" href="/nova-mark-badge.svg" />
-    <meta
-      name="description"
-      content="Pegá tu menú y tus keywords. nav-sense te muestra el gap entre cómo está armada la navegación y cómo la gente busca."
-    />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href={mark} />
+    <link rel="canonical" href={canonical} />
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="todo es lenguaje" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@rodrigoscz_" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <script is:inline>
       (function () {
         try {
@@ -34,7 +56,7 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
     >☾ oscuro</button>
     <div class="wrap">
       <header class="hero">
-        <img src="/nova-mark-badge.svg" width="120" height="120" alt="Nova mark" />
+        <img src={mark} width="120" height="120" alt="Nova mark" />
         <h1>nav-sense</h1>
         <p class="tagline">La navegación es una decisión de lenguaje, no de gusto.</p>
         <p class="sub">
@@ -111,7 +133,7 @@ import { DEMO_MENU, DEMO_KEYWORDS } from "../fixtures/demo";
 
       <footer>
         <p class="suite">
-          <img src="/nova-mark-badge.svg" width="16" height="16" alt="" />
+          <img src={mark} width="16" height="16" alt="" />
           nav-sense · parte de la suite «todo es lenguaje» ·
           <a href="https://x.com/rodrigoscz_">@rodrigoscz_</a> ·
           <a href="https://github.com/rodrigoscz/nav-sense">repo</a>
