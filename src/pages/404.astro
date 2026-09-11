@@ -1,0 +1,22 @@
+---
+// Exists so Cloudflare Pages answers unknown paths with a real 404 status.
+// Without a 404.html in the build, Pages falls back to index.html with a 200,
+// which is a soft 404: every wrong URL becomes an indexable copy of the tool.
+//
+// Visitors never see this page on novasanchez.com: the suite-router Worker
+// swaps any 404 from a tool for the main site's 404 page, so the design lives
+// in one place. It only shows up if someone opens the pages.dev host directly.
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Página no encontrada</title>
+  </head>
+  <body>
+    <p>Esta página no existe. <a href="https://novasanchez.com/">Ir a novasanchez.com</a></p>
+  </body>
+</html>
